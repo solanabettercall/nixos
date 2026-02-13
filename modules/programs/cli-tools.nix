@@ -6,6 +6,7 @@
     bat      # cat
     
     tree
+    btop
   ];
 
   programs.bat = {
