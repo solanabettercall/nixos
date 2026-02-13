@@ -12,6 +12,8 @@
       la = "eza --icons --git -lah";
       lt = "eza --icons --git --tree";
       cat = "bat";
+
+      tree = "eza --tree --icons --git-ignore";
       
       vim = "nvim";
     };
