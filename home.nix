@@ -6,6 +6,7 @@
     eza
     bat
     git
+    tree
   ];
   
   programs.zsh = {
