@@ -17,4 +17,8 @@
       paging = "never";
     };
   };
+
+  home.shellAliases = {
+    htop = "btop";
+  };  
 }
