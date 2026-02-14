@@ -7,6 +7,8 @@
     
     tree
     btop
+
+    jq
   ];
 
   programs.bat = {
