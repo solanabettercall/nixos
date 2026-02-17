@@ -1,12 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
-  imports = [
-    ./modules/programs/zsh.nix
-    ./modules/programs/git.nix
-    ./modules/programs/cli-tools.nix
-    ./modules/programs/network.nix
-  ];
+  imports = lib.filesystem.listFilesRecursive ./modules/home;
 
   home.stateVersion = "25.05";
 }

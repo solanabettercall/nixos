@@ -1,16 +1,5 @@
-{ pkgs, ... }:
-
+{ ... }:
 {
-  home.packages = with pkgs; [
-    eza      # ls
-    bat      # cat
-    
-    tree
-    btop
-
-    jq
-  ];
-
   programs.bat = {
     enable = true;
     config = {
@@ -21,6 +10,6 @@
   };
 
   home.shellAliases = {
-    htop = "btop";
-  };  
+    cat = "bat";
+  };
 }

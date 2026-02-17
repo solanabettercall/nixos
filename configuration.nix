@@ -1,22 +1,17 @@
-{ config, pkgs, ... }:
-
+{ pkgs, lib, ... }:
 {
-  imports = [
-    ./modules/system/wsl.nix
-  ];
+  imports = lib.filesystem.listFilesRecursive ./modules/system;
 
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  # System packages (минимум, основное в home.nix)
   environment.systemPackages = with pkgs; [
-    neovim
     curl
     wget
-    git
   ];
 
   programs.zsh.enable = true;
-  users.users.nixos.shell = pkgs.zsh;
+  programs.nix-ld.enable = true;
 
+  users.users.nixos.shell = pkgs.zsh;
   system.stateVersion = "25.05";
 }

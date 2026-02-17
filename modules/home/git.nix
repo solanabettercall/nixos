@@ -1,16 +1,13 @@
-{ pkgs, ... }:
-
+{ ... }:
 {
   programs.git = {
     enable = true;
-    
-    userName = "solanabettercall";
+    userName  = "solanabettercall";
     userEmail = "solanabettercall@gmail.com";
-
     extraConfig = {
-      credential.helper = "store";
+      credential.helper  = "store";
       init.defaultBranch = "master";
-      pull.rebase = false;
+      pull.rebase        = false;
     };
   };
 }
