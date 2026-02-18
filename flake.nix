@@ -10,6 +10,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/nix-index-database";
     };
+
+    home-manager = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:nix-community/home-manager/release-25.11";
+    };
   };
 
   outputs =
@@ -46,20 +51,27 @@
         channelName = "nixos-unstable";
         specialArgs = { inherit system; };
 
-        modules = [
-          {
-            nix = {
-              generateNixPathFromInputs = true;
-              generateRegistryFromInputs = true;
-              linkInputs = true;
-            };
-          }
+      modules = [
+        {
+          nix = {
+            generateNixPathFromInputs = true;
+            generateRegistryFromInputs = true;
+            linkInputs = true;
+          };
+        }
 
-          inputs.nix-index-database.nixosModules.nix-index
-          { programs.nix-index-database.comma.enable = true; }
+        inputs.nix-index-database.nixosModules.nix-index
+        { programs.nix-index-database.comma.enable = true; }
 
-          ./common.nix
-        ];
+        inputs.home-manager.nixosModules.home-manager
+        {
+          home-manager.useGlobalPkgs = true;
+          home-manager.useUserPackages = true;
+          home-manager.users.root = import ./programs/zsh/home.nix;
+        }
+
+        ./common.nix
+      ];
       };
 
       hosts = {

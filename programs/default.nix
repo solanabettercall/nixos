@@ -2,7 +2,7 @@
   imports = [
     ./motd.nix
     ./nix.nix
-    ./xonsh.nix
+    ./zsh/zsh.nix
   ];
 
   programs = {
