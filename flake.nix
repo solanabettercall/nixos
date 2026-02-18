@@ -15,6 +15,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/home-manager/release-25.11";
     };
+
+    sops-nix = {
+      inputs.nixpkgs.follows = "nixpkgs";
+      url = "github:Mic92/sops-nix";
+    };
   };
 
   outputs =
@@ -67,8 +72,13 @@
         {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
-          home-manager.users.root = import ./programs/zsh/home.nix;
+          home-manager.users.root = import ./users/root/home.nix;
+          home-manager.users.clackgot = import ./users/clackgot/home.nix;
         }
+
+        inputs.sops-nix.nixosModules.sops
+
+        ./nixosModules
 
         ./common.nix
       ];
@@ -76,10 +86,32 @@
 
       hosts = {
         bettercallsolana.modules = [
-          ./machines/bettercallsolana/configuration.nix
+          ./hosts/bettercallsolana/configuration.nix
         ];
       };
 
       nixosModules.synced = import ./services/synced;
+
+      homeConfigurations =
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          root = inputs.home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              { home.username = "root"; home.homeDirectory = "/root"; }
+              ./users/root/home.nix
+            ];
+          };
+
+          clackgot = inputs.home-manager.lib.homeManagerConfiguration {
+            inherit pkgs;
+            modules = [
+              { home.username = "clackgot"; home.homeDirectory = "/home/clackgot"; }
+              ./users/clackgot/home.nix
+            ];
+          };
+        };
     };
 }
