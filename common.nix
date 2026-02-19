@@ -13,13 +13,11 @@
 
   documentation.nixos.enable = false;
 
-  nixpkgs.hostPlatform = system;
-
   system = {
     stateVersion = "25.11";
     rebuild.enableNg = true;
     tools.nixos-option.enable = false;  # introduces cppnix dependency
   };
 
-  time.timeZone = "Asia/Hong_Kong";
+  time.timeZone = "UTC";
 }
