@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 {
   programs.rust-motd.settings.service_status.sshd = "sshd";

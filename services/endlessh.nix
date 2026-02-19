@@ -1,4 +1,4 @@
-{ ... }:
+_:
 
 # Use this on any machine without an external firewall,
 # and set real ssh port to another value.

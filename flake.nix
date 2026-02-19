@@ -23,7 +23,7 @@
   outputs = inputs@{ self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
       pkgsFor = import nixpkgs {
         inherit system;
         config.allowUnfreePredicate =
@@ -34,7 +34,7 @@
       };
 
       commonModules = [
-        ({ ... }: {
+        (_: {
           nix = {
             registry = lib.mapAttrs (_: flake: { inherit flake; }) (builtins.removeAttrs inputs [ "self" ]);
             nixPath = lib.mapAttrsToList (name: flake: "${name}=${flake}") (builtins.removeAttrs inputs [ "self" ]);
@@ -46,10 +46,12 @@
 
         inputs.home-manager.nixosModules.home-manager
         {
-          home-manager.useGlobalPkgs = true;
-          home-manager.useUserPackages = true;
-          home-manager.users.root = import ./users/root/home.nix;
-          home-manager.users.clackgot = import ./users/clackgot/home.nix;
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            users.root = import ./users/root/home.nix;
+            users.clackgot = import ./users/clackgot/home.nix;
+          };
         }
 
         inputs.sops-nix.nixosModules.sops
