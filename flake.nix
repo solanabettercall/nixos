@@ -4,8 +4,6 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-25.11";
 
-    flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
-
     nix-index-database = {
       inputs.nixpkgs.follows = "nixpkgs";
       url = "github:nix-community/nix-index-database";
@@ -22,48 +20,26 @@
     };
   };
 
-  outputs =
-    {
-      self,
-      nixpkgs,
-      flake-utils-plus,
-      ...
-    }@inputs:
+  outputs = inputs@{ self, nixpkgs, ... }:
     let
       system = "x86_64-linux";
-    in
-    flake-utils-plus.lib.mkFlake rec {
-      inherit self inputs;
-      inherit (nixpkgs) lib;
-      supportedSystems = [ system ];
-
-      channels = {
-        nixos-unstable = {
-          input = nixpkgs;
-        };
-      };
-
-      channelsConfig = {
-        allowUnfreePredicate =
+      lib = nixpkgs.lib;
+      pkgsFor = import nixpkgs {
+        inherit system;
+        config.allowUnfreePredicate =
           pkg:
           builtins.elem (lib.getName pkg) [
             "cloudflare-warp"
           ];
       };
 
-      hostDefaults = {
-        inherit system;
-        channelName = "nixos-unstable";
-        specialArgs = { inherit system; };
-
-      modules = [
-        {
+      commonModules = [
+        ({ ... }: {
           nix = {
-            generateNixPathFromInputs = true;
-            generateRegistryFromInputs = true;
-            linkInputs = true;
+            registry = lib.mapAttrs (_: flake: { inherit flake; }) (builtins.removeAttrs inputs [ "self" ]);
+            nixPath = lib.mapAttrsToList (name: flake: "${name}=${flake}") (builtins.removeAttrs inputs [ "self" ]);
           };
-        }
+        })
 
         inputs.nix-index-database.nixosModules.nix-index
         { programs.nix-index-database.comma.enable = true; }
@@ -77,41 +53,22 @@
         }
 
         inputs.sops-nix.nixosModules.sops
-
         ./nixosModules
-
         ./common.nix
       ];
-      };
-
-      hosts = {
-        bettercallsolana.modules = [
-          ./hosts/bettercallsolana/configuration.nix
-        ];
+    in
+    {
+      nixosConfigurations = {
+        bettercallsolana = lib.nixosSystem {
+          inherit system;
+          pkgs = pkgsFor;
+          specialArgs = { inherit system; };
+          modules = commonModules ++ [
+            ./hosts/bettercallsolana/configuration.nix
+          ];
+        };
       };
 
       nixosModules.synced = import ./services/synced;
-
-      homeConfigurations =
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
-        {
-          root = inputs.home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              { home.username = "root"; home.homeDirectory = "/root"; }
-              ./users/root/home.nix
-            ];
-          };
-
-          clackgot = inputs.home-manager.lib.homeManagerConfiguration {
-            inherit pkgs;
-            modules = [
-              { home.username = "clackgot"; home.homeDirectory = "/home/clackgot"; }
-              ./users/clackgot/home.nix
-            ];
-          };
-        };
     };
 }

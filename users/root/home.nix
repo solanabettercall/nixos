@@ -23,7 +23,10 @@
     '';
   };
 
-  programs.starship.enable = true;
+  programs.starship = {
+    enable = true;
+    settings = import ../common/starship-settings.nix;
+  };
 
   home.packages = with pkgs; [ eza bat ];
 
